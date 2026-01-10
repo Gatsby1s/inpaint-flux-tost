@@ -76,9 +76,19 @@ def closestNumber(n, m):
 def generate(input):
     values = input["input"]
 
-    input_mask = values['input_mask']
-    input_mask = download_file(input_mask)
-    input_image = input_mask
+    # Support both base64 and URL input
+    if 'input_mask_base64' in values:
+        # Decode base64 image
+        image_data = base64.b64decode(values['input_mask_base64'])
+        input_image = '/content/ComfyUI/input/temp_input.png'
+        os.makedirs('/content/ComfyUI/input', exist_ok=True)
+        with open(input_image, 'wb') as f:
+            f.write(image_data)
+    else:
+        # Fallback to URL download
+        input_mask = values.get('input_mask', '')
+        input_image = download_file(input_mask)
+    
     width, height = Image.open(input_image).size
     
     positive_prompt = values.get('positive_prompt', 'clean background, no watermark, seamless')
@@ -99,11 +109,11 @@ def generate(input):
     cond = nodes.CLIPTextEncode().encode(clip, positive_prompt)[0]
     cond = FluxGuidance.append(cond, guidance)[0]
     n_cond = nodes.CLIPTextEncode().encode(clip, negative_prompt)[0]
-    input_image, input_mask = LoadImage.load_image(input_image)
+    input_image_tensor, input_mask = LoadImage.load_image(input_image)
     latent_image = EmptyLatentImage.generate(closestNumber(width, 8), closestNumber(height, 8))[0]
     positive, negative = ControlNetInpaintingAliMamaApply.apply_inpaint_controlnet(
         positive=cond, negative=n_cond, control_net=controlnet, 
-        image=input_image, mask=input_mask, strength=controlnet_strength, 
+        image=input_image_tensor, mask=input_mask, strength=controlnet_strength, 
         vae=vae, start_percent=0, end_percent=1
     )
     sample = nodes.common_ksampler(
