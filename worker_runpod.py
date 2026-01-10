@@ -13,18 +13,37 @@ UNETLoader = NODE_CLASS_MAPPINGS["UNETLoader"]()
 VAELoader = NODE_CLASS_MAPPINGS["VAELoader"]()
 ControlNetLoader = NODE_CLASS_MAPPINGS["ControlNetLoader"]()
 
-FluxGuidance = nodes_flux.NODE_CLASS_MAPPINGS["FluxGuidance"]()
-RandomNoise = nodes_custom_sampler.NODE_CLASS_MAPPINGS["RandomNoise"]()
-BasicGuider = nodes_custom_sampler.NODE_CLASS_MAPPINGS["BasicGuider"]()
-KSamplerSelect = nodes_custom_sampler.NODE_CLASS_MAPPINGS["KSamplerSelect"]()
-BasicScheduler = nodes_custom_sampler.NODE_CLASS_MAPPINGS["BasicScheduler"]()
-SamplerCustomAdvanced = nodes_custom_sampler.NODE_CLASS_MAPPINGS["SamplerCustomAdvanced"]()
+# Fix for nodes_flux compatibility
+try:
+    FluxGuidance = nodes_flux.NODE_CLASS_MAPPINGS["FluxGuidance"]()
+except (AttributeError, KeyError):
+    FluxGuidance = nodes_flux.FluxGuidance()
+
+# Fix for nodes_custom_sampler compatibility
+try:
+    RandomNoise = nodes_custom_sampler.NODE_CLASS_MAPPINGS["RandomNoise"]()
+    BasicGuider = nodes_custom_sampler.NODE_CLASS_MAPPINGS["BasicGuider"]()
+    KSamplerSelect = nodes_custom_sampler.NODE_CLASS_MAPPINGS["KSamplerSelect"]()
+    BasicScheduler = nodes_custom_sampler.NODE_CLASS_MAPPINGS["BasicScheduler"]()
+    SamplerCustomAdvanced = nodes_custom_sampler.NODE_CLASS_MAPPINGS["SamplerCustomAdvanced"]()
+except (AttributeError, KeyError):
+    RandomNoise = nodes_custom_sampler.RandomNoise()
+    BasicGuider = nodes_custom_sampler.BasicGuider()
+    KSamplerSelect = nodes_custom_sampler.KSamplerSelect()
+    BasicScheduler = nodes_custom_sampler.BasicScheduler()
+    SamplerCustomAdvanced = nodes_custom_sampler.SamplerCustomAdvanced()
+
 VAEDecode = NODE_CLASS_MAPPINGS["VAEDecode"]()
 VAEEncode = NODE_CLASS_MAPPINGS["VAEEncode"]()
 EmptyLatentImage = NODE_CLASS_MAPPINGS["EmptyLatentImage"]()
 LoadImage = NODE_CLASS_MAPPINGS["LoadImage"]()
 ImageScaleBy = NODE_CLASS_MAPPINGS["ImageScaleBy"]()
-ControlNetInpaintingAliMamaApply = nodes_controlnet.NODE_CLASS_MAPPINGS["ControlNetInpaintingAliMamaApply"]()
+
+# Fix for nodes_controlnet compatibility
+try:
+    ControlNetInpaintingAliMamaApply = nodes_controlnet.NODE_CLASS_MAPPINGS["ControlNetInpaintingAliMamaApply"]()
+except (AttributeError, KeyError):
+    ControlNetInpaintingAliMamaApply = nodes_controlnet.ControlNetInpaintingAliMamaApply()
 
 with torch.inference_mode():
     clip = DualCLIPLoader.load_clip("t5xxl_fp16.safetensors", "clip_l.safetensors", "flux")[0]
