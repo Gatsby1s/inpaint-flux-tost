@@ -1,3 +1,6 @@
+import subprocess
+import sys
+subprocess.check_call([sys.executable, "-m", "pip", "install", "numpy<2", "-q"])
 import os, json, requests, runpod
 import random, time, base64
 import torch
