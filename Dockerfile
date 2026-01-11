@@ -14,7 +14,7 @@ RUN adduser --disabled-password --gecos '' camenduru && \
 USER camenduru
 
 RUN pip install -q opencv-python imageio imageio-ffmpeg ffmpeg-python av runpod \
-    xformers==0.0.25 torchsde einops diffusers transformers accelerate && \
+    xformers==0.0.25 torchsde einops diffusers transformers accelerate "numpy<2" && \
     git clone https://github.com/comfyanonymous/ComfyUI /content/ComfyUI && \
     aria2c --console-log-level=error -c -x 16 -s 16 -k 1M https://huggingface.co/camenduru/FLUX.1-dev/resolve/main/flux1-dev.sft -d /content/ComfyUI/models/unet -o flux1-dev.sft && \
     aria2c --console-log-level=error -c -x 16 -s 16 -k 1M https://huggingface.co/camenduru/FLUX.1-dev/resolve/main/clip_l.safetensors -d /content/ComfyUI/models/clip -o clip_l.safetensors && \
